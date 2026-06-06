@@ -1,6 +1,4 @@
 "use client";
-import { useEffect, useState } from "react";
-import { SECTOR_META } from "@/lib/sectors";
 
 interface QuoteItem {
   ticker: string;

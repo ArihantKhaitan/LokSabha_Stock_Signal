@@ -1,7 +1,7 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { cn, fmtDate, sentimentClass, intensityBar } from "@/lib/utils";
+import { fmtDate, sentimentClass } from "@/lib/utils";
 import ReturnChips from "@/components/ReturnChips";
 import { SECTOR_META } from "@/lib/sectors";
 import type { EventSignal } from "@/types";
