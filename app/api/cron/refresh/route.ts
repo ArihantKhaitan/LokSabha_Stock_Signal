@@ -26,7 +26,7 @@ export async function GET(req: Request) {
 
   const started = Date.now();
   const to      = dataEnd();
-  const tickers = [...new Set(Object.values(SECTOR_META).flatMap((m) => m.tickers))];
+  const tickers = Array.from(new Set(Object.values(SECTOR_META).flatMap((m) => m.tickers)));
   const results: Record<string, string> = {};
 
   // 1. Refresh all stock price data

@@ -5,7 +5,7 @@ import { SECTOR_META } from "@/lib/sectors";
 export const dynamic = "force-dynamic";
 
 // All tracked tickers
-const ALL_TICKERS = [...new Set(Object.values(SECTOR_META).flatMap((m) => m.tickers))];
+const ALL_TICKERS = Array.from(new Set(Object.values(SECTOR_META).flatMap((m) => m.tickers)));
 
 let _quoteCache: { data: unknown[]; ts: number } | null = null;
 const CACHE_MS = 5 * 60 * 1000; // 5 min
