@@ -127,7 +127,8 @@ function ScatterPlot({
         ax.selectAll("text").attr("fill", "#6E7681").attr("font-size", "9px");
         ax.selectAll(".tick line").attr("stroke", "none");
       });
-  }, [corr, signals]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [corr, signals, color, sigColor]);
 
   const sig = corr.is_significant;
 

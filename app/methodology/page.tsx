@@ -77,7 +77,7 @@ export default function MethodologyPage() {
       <section className="glass rounded-2xl p-6 mb-5">
         <h2 className="text-lss-text font-bold mb-4">Significance Score Formula (1–10)</h2>
         <p className="text-lss-secondary text-[13px] mb-4">
-          To avoid labelling arbitrary numbers as "hours debated" (which we cannot verify),
+          To avoid labelling arbitrary numbers as &ldquo;hours debated&rdquo; (which we cannot verify),
           we use a transparent scoring formula:
         </p>
         <div className="overflow-x-auto">
@@ -161,7 +161,7 @@ export default function MethodologyPage() {
             ["Sansad TV / sansad.in", "https://sansad.in", "Session transcripts and proceedings"],
             ["Yahoo Finance (via yahoo-finance2)", "https://github.com/gadicc/node-yahoo-finance2", "Real OHLCV stock prices"],
             ["NSE India", "https://www.nseindia.com", "Ticker symbol reference"],
-          ].map(([name, url, usage]) => (
+          ].map(([name, , usage]) => (
             <div key={name} className="flex items-start gap-3">
               <span className="text-lss-accent font-semibold shrink-0">{name}</span>
               <span className="text-lss-tertiary">{usage}</span>
@@ -174,7 +174,7 @@ export default function MethodologyPage() {
       <section className="glass rounded-2xl p-6 mb-5">
         <h2 className="text-lss-text font-bold mb-3">Academic Context</h2>
         <div className="space-y-2 text-[12px] text-lss-secondary">
-          <p><strong className="text-lss-text">Ziobrowski et al. (2004, 2011)</strong> — Found statistically significant alpha in US Congress members' personal stock portfolios, suggesting legislative information has market value.</p>
+          <p><strong className="text-lss-text">Ziobrowski et al. (2004, 2011)</strong> &mdash; Found statistically significant alpha in US Congress members&apos; personal stock portfolios, suggesting legislative information has market value.</p>
           <p><strong className="text-lss-text">Eggers & Hainmueller (2013)</strong> — Follow-up questioning the magnitude of the US Congressional effect, highlighting small-sample concerns. Directly relevant caution for this project.</p>
           <p><strong className="text-lss-text">Jha & Laurence (2018)</strong> — Indian parliamentary questions and sectoral anomalies — the closest Indian analogue we are aware of.</p>
         </div>

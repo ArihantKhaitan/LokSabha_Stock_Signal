@@ -2,7 +2,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import CandlestickChart from "@/components/CandlestickChart";
-import ReturnChips from "@/components/ReturnChips";
 import { PARLIAMENT_EVENTS, ALL_SESSIONS } from "@/lib/parliament";
 import { SECTOR_META } from "@/lib/sectors";
 import { fmtDate, fmtPct, sentimentClass } from "@/lib/utils";

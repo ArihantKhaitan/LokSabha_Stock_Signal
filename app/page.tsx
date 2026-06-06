@@ -1,4 +1,3 @@
-import TextShimmer from "@/components/ui/TextShimmer";
 import StatCard from "@/components/StatCard";
 import SessionTimeline from "@/components/SessionTimeline";
 import { computeAllSignals, buildSummaryStats, computeAllCorrelations } from "@/lib/signals";
@@ -23,7 +22,6 @@ export default async function HomePage() {
 
   const strongestSig  = summary?.strongest_signal;
   const sigPct        = strongestSig?.ret_t1 != null ? fmtPct(strongestSig.ret_t1) : "N/A";
-  const mostReactivePct = summary ? fmtPct(summary.most_reactive_t5_pct / 100) : "N/A";
   const sigCount      = correlations.filter((c) => c.is_significant).length;
 
   return (
@@ -99,7 +97,7 @@ export default async function HomePage() {
           </p>
           <div className="font-mono text-sm rounded-xl p-4"
             style={{ background: "rgba(13,17,23,0.8)", border: "1px solid #21262d" }}>
-            <span className="text-lss-secondary">// Signal formula</span>
+            <span className="text-lss-secondary">{"// Signal formula"}</span>
             <br />
             <span className="text-lss-blue">excess_t1</span>{" "}
             <span className="text-lss-text">= T+1_return − sector_avg_daily_return</span>
@@ -107,13 +105,13 @@ export default async function HomePage() {
             <span className="text-lss-blue">signal</span>{" "}
             <span className="text-lss-text">= excess_t1 × significance_score</span>
             <br />
-            <span className="text-lss-secondary">// Correlation</span>
+            <span className="text-lss-secondary">{"// Correlation"}</span>
             <br />
             <span className="text-lss-blue">r, p</span>{" "}
             <span className="text-lss-text">= pearsonR(significance_scores, t1_returns)</span>
           </div>
           <p className="text-[11px] text-lss-tertiary mt-3 italic">
-            Inspired by Ziobrowski et al. (2004) — "Abnormal Returns from US Senate Stock Investments"
+            Inspired by Ziobrowski et al. (2004) &mdash; &ldquo;Abnormal Returns from US Senate Stock Investments&rdquo;
           </p>
         </div>
 
