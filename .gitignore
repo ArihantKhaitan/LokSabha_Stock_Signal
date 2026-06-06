@@ -1,37 +1,29 @@
-# Python
-__pycache__/
-*.py[cod]
-*.pyo
-*.pyd
-.Python
-*.egg-info/
-dist/
+# Next.js
+.next/
+out/
 build/
-*.egg
-.eggs/
 
-# Virtual environments
-venv/
-.venv/
-env/
-.env/
+# Deps
+node_modules/
 
-# Cache (yfinance data — large Parquet files, can be re-fetched)
-cache/
+# Env — keep .env.local.example, never commit actual secrets
+.env.local
+.env.*.local
+.env
 
-# Streamlit internal state
-.streamlit/secrets.toml
+# Cache
+.cache/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
 
 # IDE
 .vscode/
 .idea/
 *.swp
-*.swo
 
-# OS
-.DS_Store
-Thumbs.db
-desktop.ini
-
-# Logs
-*.log
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
