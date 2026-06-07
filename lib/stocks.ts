@@ -3,9 +3,8 @@
  * All prices are fetched from Yahoo Finance — no synthetic data.
  */
 import yahooFinanceDefault from "yahoo-finance2";
-// bundler moduleResolution resolves the default export as the class type, not the singleton instance
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const yahooFinance = yahooFinanceDefault as any;
+// bundler moduleResolution resolves the default export as the class, not the singleton instance
+const yahooFinance = yahooFinanceDefault as any; // eslint-disable-line
 import { SECTOR_META, DATA_START, dataEnd } from "@/lib/sectors";
 import type { SectorKey } from "@/types";
 
