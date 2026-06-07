@@ -4,28 +4,31 @@
  */
 import { SECTOR_META, DATA_START, dataEnd } from "@/lib/sectors";
 import type { SectorKey } from "@/types";
-// bundler moduleResolution resolves the CJS default export as the class, not the singleton
-// eslint-disable-line is intentional — @typescript-eslint plugin is not installed
 import yahooFinanceDefault from "yahoo-finance2";
-const yf = yahooFinanceDefault as unknown as {
-  historical: (
-    ticker: string,
-    opts: { period1: string; period2: string; interval: string }
-  ) => Promise<Array<{
-    date: Date;
-    open?: number | null;
-    high?: number | null;
-    low?: number | null;
-    close?: number | null;
-    volume?: number | null;
-  }>>;
-  quote: (ticker: string) => Promise<{
-    regularMarketPrice?: number | null;
-    regularMarketChange?: number | null;
-    regularMarketChangePercent?: number | null;
-    marketState?: string | null;
-  }>;
+
+type YFHistoricalRow = {
+  date: Date;
+  open?: number | null;
+  high?: number | null;
+  low?: number | null;
+  close?: number | null;
+  volume?: number | null;
 };
+
+type YFQuote = {
+  regularMarketPrice?: number | null;
+  regularMarketChange?: number | null;
+  regularMarketChangePercent?: number | null;
+  marketState?: string | null;
+};
+
+type YFClient = {
+  historical: (symbol: string, opts: { period1: string; period2: string; interval: string }) => Promise<YFHistoricalRow[]>;
+  quote: (symbol: string) => Promise<YFQuote>;
+};
+
+// bundler moduleResolution gives us the class type, not the singleton — cast to real shape
+const yf = yahooFinanceDefault as unknown as YFClient;
 
 export interface OHLCVRow {
   ticker: string;
