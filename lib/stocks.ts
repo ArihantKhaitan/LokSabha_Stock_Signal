@@ -2,7 +2,9 @@
  * Real stock data via yahoo-finance2 (server-side only).
  * All prices are fetched from Yahoo Finance — no synthetic data.
  */
-import yahooFinance from "yahoo-finance2";
+// yahoo-finance2 is CJS; bundler moduleResolution resolves its type as the class not the instance
+// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any
+const yahooFinance = require("yahoo-finance2") as any;
 import { SECTOR_META, DATA_START, dataEnd } from "@/lib/sectors";
 import type { SectorKey } from "@/types";
 
