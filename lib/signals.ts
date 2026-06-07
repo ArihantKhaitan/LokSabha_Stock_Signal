@@ -158,7 +158,7 @@ export function computeSectorCorrelation(
     hi_intensity_mean_t1_pct: +(mean(hi) * 100).toFixed(3),
     lo_intensity_mean_t1_pct: +(mean(lo) * 100).toFixed(3),
     interpretation: buildInterpretation(r, p, sector, mean(ys)),
-    is_significant: p < 0.05,
+    is_significant: p < 0.006, // Bonferroni-corrected: 0.05 / 9 sectors ≈ 0.006
   };
 }
 
@@ -198,13 +198,13 @@ export function buildSummaryStats(signals: EventSignal[]): SummaryStats {
     strongest_signal:    strongest,
     most_reactive_sector: (mostReactive?.[0] as SectorKey) ?? null,
     most_reactive_t5_pct: +(((mostReactive?.[1] ?? 0) * 100).toFixed(2)),
-    data_as_of:          new Date().toISOString().slice(0, 10),
+    data_as_of:          signals.reduce((max, s) => s.event.date > max ? s.event.date : max, "2023-01-01"),
   };
 }
 
 function buildInterpretation(r: number, p: number, sector: string, meanT1: number): string {
   const dir  = r >= 0 ? "positive" : "negative";
-  const sig  = p < 0.05 ? "statistically significant (p < 0.05)" : "not statistically significant (p ≥ 0.05)";
+  const sig  = p < 0.006 ? "statistically significant after correction (p < 0.006)" : "not statistically significant";
   const str  = Math.abs(r) >= 0.5 ? "Strong" : Math.abs(r) >= 0.3 ? "Moderate" : Math.abs(r) >= 0.15 ? "Weak" : "Negligible";
   const dirW = meanT1 > 0 ? "upward" : "downward";
   return `${str} ${dir} correlation (r=${r.toFixed(2)}, p=${p.toFixed(3)}) — ${sig}. On average, ${sector} stocks moved ${dirW} ${Math.abs(meanT1 * 100).toFixed(2)}% the day after a parliamentary debate on this sector.`;

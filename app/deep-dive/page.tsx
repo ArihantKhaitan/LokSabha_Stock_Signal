@@ -78,13 +78,11 @@ export default function DeepDivePage() {
   }, {});
 
   const writtenAnalysis = () => {
-    if (!ev || !signal?.ret_t1) return null;
-    const dir  = signal.ret_t1 >= 0 ? "rose" : "fell";
-    const dirT5 = (signal.ret_t5 ?? 0) >= 0 ? "rose" : "fell";
-    const pct1 = Math.abs(signal.ret_t1 * 100).toFixed(2);
-    const pct5 = Math.abs((signal.ret_t5 ?? 0) * 100).toFixed(2);
-    const exPct = signal.excess_t1 ? Math.abs(signal.excess_t1 * 100).toFixed(2) : "0.00";
-    const exDir = (signal.excess_t1 ?? 0) > 0 ? "above" : "below";
+    if (!ev || signal?.ret_t1 == null) return null;
+    const dir   = signal.ret_t1 >= 0 ? "rose" : "fell";
+    const pct1  = Math.abs(signal.ret_t1 * 100).toFixed(2);
+    const exPct = signal.excess_t1 != null ? Math.abs(signal.excess_t1 * 100).toFixed(2) : null;
+    const exDir = signal.excess_t1 == null ? "" : signal.excess_t1 > 0 ? "above" : signal.excess_t1 < 0 ? "below" : "equal to";
     return (
       <p className="text-lss-secondary text-sm leading-relaxed">
         On <strong className="text-lss-text">{fmtDate(ev.date)}</strong>, the Lok Sabha debated{" "}
@@ -94,11 +92,19 @@ export default function DeepDivePage() {
         <br /><br />
         In the trading session immediately following (T+1), the {SECTOR_META[ev.sector]?.label ?? ev.sector} basket{" "}
         <strong style={{ color: signal.ret_t1 >= 0 ? "#1E7A30" : "#B82020" }}>{dir} {pct1}%</strong>.
-        This was <strong className="text-lss-text">{exPct}%</strong> {exDir} the sector&rsquo;s historical daily average,{" "}
-        {parseFloat(exPct) > 0.2 ? "suggesting a non-trivial market reaction." : "a movement consistent with normal daily variance."}
+        {exPct != null && (
+          <>{" "}This was <strong className="text-lss-text">{exPct}%</strong> {exDir} the sector&rsquo;s historical daily average,{" "}
+          {parseFloat(exPct) > 0.2 ? "suggesting a non-trivial market reaction." : "a movement consistent with normal daily variance."}</>
+        )}
         <br /><br />
-        Over the following week (T+5), the basket{" "}
-        <strong style={{ color: (signal.ret_t5 ?? 0) >= 0 ? "#1E7A30" : "#B82020" }}>{dirT5} {pct5}%</strong>.{" "}
+        {signal.ret_t5 != null ? (
+          <>Over the following week (T+5), the basket{" "}
+          <strong style={{ color: signal.ret_t5 >= 0 ? "#1E7A30" : "#B82020" }}>
+            {signal.ret_t5 >= 0 ? "rose" : "fell"} {Math.abs(signal.ret_t5 * 100).toFixed(2)}%
+          </strong>.</>
+        ) : (
+          <>T+5 return data is not available for this event.</>
+        )}{" "}
         <em className="text-lss-tertiary text-[11px]">
           Note: These movements reflect the equal-weighted basket average across {SECTOR_META[ev.sector]?.tickers.length} stocks
           and are influenced by many concurrent market factors beyond the parliamentary debate. Correlation ≠ causation.

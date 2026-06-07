@@ -76,6 +76,18 @@ export default function CandlestickChart({
 
     // Debate date annotation
     const debateX = x(debateDate);
+    const debateInRange = debateX != null;
+
+    if (!debateInRange) {
+      svg.append("text")
+        .attr("x", margin.left + inner.w / 2)
+        .attr("y", margin.top + inner.h / 2 + 20)
+        .attr("text-anchor", "middle")
+        .attr("fill", "#9C7850")
+        .attr("font-size", "10px")
+        .text("⚠ Debate date falls on a market holiday — marker not shown");
+    }
+
     if (debateX != null) {
       const cx = debateX + x.bandwidth() / 2;
       g.append("line")

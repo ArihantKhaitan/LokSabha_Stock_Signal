@@ -18,6 +18,7 @@ export function fmtR(r: number | null | undefined): string {
 
 export function fmtP(p: number | null | undefined): string {
   if (p == null) return "";
+  if (p < 0.0001) return "p < 0.0001";
   return `p = ${p.toFixed(4)}`;
 }
 

@@ -2,7 +2,7 @@ import StatCard from "@/components/StatCard";
 import SessionTimeline from "@/components/SessionTimeline";
 import { computeAllSignals, buildSummaryStats, computeAllCorrelations } from "@/lib/signals";
 import { getSignals as getSupabaseSignals } from "@/lib/supabase";
-import { SECTOR_META } from "@/lib/sectors";
+import { SECTOR_META, ALL_SECTORS } from "@/lib/sectors";
 import { fmtPct, fmtDate } from "@/lib/utils";
 import type { EventSignal } from "@/types";
 
@@ -60,7 +60,7 @@ export default async function HomePage() {
         />
         <StatCard
           label="Sectors Covered"
-          value={String(summary?.sectors_covered ?? 9)}
+          value={String(summary?.sectors_covered ?? ALL_SECTORS.length)}
           sub="Pharma, Defence, IT & more"
           color="#58A6FF"
           delay={0.08}
@@ -195,10 +195,17 @@ export default async function HomePage() {
       )}
 
       {/* ── Footer note ──────────────────────────────────────────────── */}
-      <p className="text-center text-[11px] text-lss-tertiary">
-        Stock prices are real data from Yahoo Finance. Debate importance scores are estimated.
-        This is a research tool — not investment advice.
-      </p>
+      <div className="text-center space-y-1">
+        <p className="text-[11px] text-lss-tertiary">
+          Stock prices are real data from Yahoo Finance. Debate importance scores are estimated.
+          This is a research tool — not investment advice.
+        </p>
+        {summary?.data_as_of && (
+          <p className="text-[10px] text-lss-tertiary">
+            Last tracked debate: {fmtDate(summary.data_as_of)}
+          </p>
+        )}
+      </div>
     </div>
   );
 }

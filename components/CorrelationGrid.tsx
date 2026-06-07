@@ -48,10 +48,14 @@ function ScatterPlot({
 
     const xExt = d3.extent(data, (d) => d.x) as [number, number];
     const yExt = d3.extent(data, (d) => d.y) as [number, number];
-    const pad  = 0.5;
+    const xPad = Math.max(0.5, (xExt[1] - xExt[0]) * 0.1);
+    const yRange = Math.max(0.5, yExt[1] - yExt[0]);
+    const yPad = yRange * 0.15;
 
-    const x = d3.scaleLinear().domain([xExt[0] - pad, xExt[1] + pad]).range([0, inner.w]);
-    const y = d3.scaleLinear().domain([yExt[0] - 0.2, yExt[1] + 0.2]).range([inner.h, 0]);
+    const xDomain: [number, number] = [xExt[0] - xPad, xExt[1] + xPad];
+    const yDomain: [number, number] = [yExt[0] - yPad, yExt[1] + yPad];
+    const x = d3.scaleLinear().domain(xDomain).range([0, inner.w]);
+    const y = d3.scaleLinear().domain(yDomain).range([inner.h, 0]);
 
     const g = svg.append("g").attr("transform", `translate(${margin.left},${margin.top})`);
 
@@ -68,22 +72,23 @@ function ScatterPlot({
         .attr("stroke", "#30363D").attr("stroke-width", 1);
     }
 
-    // Trend line
-    if (data.length >= 2 && corr.pearson_r != null) {
+    // Trend line — require n>=3 to avoid misleading 2-point "fits"
+    if (data.length >= 3 && corr.pearson_r != null) {
       const xs = data.map((d) => d.x), ys = data.map((d) => d.y);
       const mx = xs.reduce((a, b) => a + b) / xs.length;
       const my = ys.reduce((a, b) => a + b) / ys.length;
-      const m  = xs.reduce((s, xi, i) => s + (xi - mx) * (ys[i] - my), 0) /
-                 xs.reduce((s, xi) => s + (xi - mx) ** 2, 0);
-      const b  = my - m * mx;
-      const x0 = xExt[0], x1 = xExt[1];
-      g.append("line")
-        .attr("x1", x(x0)).attr("y1", y(m * x0 + b))
-        .attr("x2", x(x1)).attr("y2", y(m * x1 + b))
-        .attr("stroke", sigColor)
-        .attr("stroke-width", 1.5)
-        .attr("stroke-dasharray", "4,3")
-        .attr("opacity", 0.7);
+      const denom = xs.reduce((s, xi) => s + (xi - mx) ** 2, 0);
+      if (denom > 0) {
+        const m = xs.reduce((s, xi, i) => s + (xi - mx) * (ys[i] - my), 0) / denom;
+        const b = my - m * mx;
+        g.append("line")
+          .attr("x1", x(xDomain[0])).attr("y1", y(m * xDomain[0] + b))
+          .attr("x2", x(xDomain[1])).attr("y2", y(m * xDomain[1] + b))
+          .attr("stroke", sigColor)
+          .attr("stroke-width", 1.5)
+          .attr("stroke-dasharray", "4,3")
+          .attr("opacity", 0.7);
+      }
     }
 
     // Dots
@@ -156,7 +161,7 @@ function ScatterPlot({
           </span>
           <p className="text-[10px] text-lss-tertiary">{fmtP(corr.p_value)}</p>
           {sig && (
-            <span className="text-[9px] font-bold text-lss-accent">★ p&lt;0.05</span>
+            <span className="text-[9px] font-bold text-lss-accent">★ robust pattern</span>
           )}
         </div>
       </div>

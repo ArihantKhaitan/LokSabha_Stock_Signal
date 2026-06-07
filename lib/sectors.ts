@@ -67,7 +67,9 @@ export const SESSIONS_REGISTRY: LokSabhaSession[] = [
   { name: "Monsoon Session 2024", start: "2024-07-22", end: "2024-08-09", status: "completed" },
   { name: "Winter Session 2024",  start: "2024-11-25", end: "2024-12-20", status: "completed" },
   { name: "Budget Session 2025",  start: "2025-01-31", end: "2025-05-09", status: "completed" },
-  { name: "Monsoon Session 2025", start: "2025-07-21", end: "2025-08-22", status: "scheduled" },
+  { name: "Monsoon Session 2025", start: "2025-07-21", end: "2025-08-22", status: "completed" },
+  { name: "Winter Session 2025",  start: "2025-11-25", end: "2025-12-19", status: "completed" },
+  { name: "Budget Session 2026",  start: "2026-01-31", end: "2026-04-04", status: "completed" },
 ];
 
 export function getActiveSession(): LokSabhaSession | null {

@@ -21,7 +21,9 @@ export default function ExplorerPage() {
       const res  = await fetch(`/api/signals?sector=${sector}`);
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Failed to fetch signals");
-      setSignals(json.signals as EventSignal[]);
+      const received = json.signals;
+      if (!Array.isArray(received)) throw new Error("Invalid response format");
+      setSignals(received as EventSignal[]);
     } catch (e) {
       setError(String(e));
     } finally {
@@ -118,7 +120,7 @@ export default function ExplorerPage() {
         >
           <span className="font-bold" style={{ color }}>{SECTOR_META[sector].label}</span>
           <span className="text-lss-secondary">
-            {filtered.length} debates · Next-day avg:{" "}
+            {withData.length} debates with price data · Next-day avg:{" "}
             <span className={`font-bold font-mono ${avgT1 >= 0 ? "text-lss-green" : "text-lss-red"}`}>
               {fmtPct(avgT1)}
             </span>
@@ -142,7 +144,7 @@ export default function ExplorerPage() {
         <div className="glass-negative rounded-2xl p-5 text-lss-red text-sm">{error}</div>
       ) : filtered.length === 0 ? (
         <div className="glass rounded-2xl p-10 text-center text-lss-tertiary text-sm">
-          No events match the current filters.
+          No debates match the current filters. Try a different sector or lower the debate importance slider.
         </div>
       ) : (
         <div className="flex flex-col gap-3">

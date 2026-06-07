@@ -23,9 +23,11 @@ export default function SessionTimeline() {
     svg.selectAll("*").remove();
     svg.attr("height", height);
 
+    const today = new Date();
     const allDates = SESSIONS_REGISTRY.flatMap((s) => [new Date(s.start), new Date(s.end)]);
+    const domainMax = d3.max([...allDates, today])!;
     const xScale = d3.scaleTime()
-      .domain([d3.min(allDates)!, d3.max(allDates)!])
+      .domain([d3.min(allDates)!, domainMax])
       .range([0, inner.w]);
 
     const yScale = d3.scaleBand()
@@ -92,10 +94,8 @@ export default function SessionTimeline() {
       .attr("font-size", "10px")
       .text((d) => d.name);
 
-    // Today line
-    const today = new Date();
-    const allEnd = d3.max(allDates)!;
-    if (today <= allEnd) {
+    // Today line — always show
+    {
       g.append("line")
         .attr("x1", xScale(today)).attr("x2", xScale(today))
         .attr("y1", 0).attr("y2", inner.h)
