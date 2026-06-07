@@ -45,7 +45,7 @@ export default function MethodologyPage() {
           </div>
           <div>
             <p className="text-lss-text font-semibold mb-1">Step 2 — Return Windows</p>
-            <div className="font-mono text-[12px] rounded-xl p-4" style={{ background: "#0D1117", border: "1px solid #21262d" }}>
+            <div className="font-mono text-[12px] rounded-xl p-4" style={{ background: "#1A0800", border: "1px solid rgba(224,88,24,0.2)", color: "#F5EDD8" }}>
               T−1: day before debate (pre-event baseline)<br/>
               T+1: first trading day after debate date<br/>
               T+2: two trading days after<br/>
@@ -54,14 +54,14 @@ export default function MethodologyPage() {
           </div>
           <div>
             <p className="text-lss-text font-semibold mb-1">Step 3 — Excess Return & Signal</p>
-            <div className="font-mono text-[12px] rounded-xl p-4" style={{ background: "#0D1117", border: "1px solid #21262d" }}>
+            <div className="font-mono text-[12px] rounded-xl p-4" style={{ background: "#1A0800", border: "1px solid rgba(224,88,24,0.2)", color: "#F5EDD8" }}>
               excess_t1 = T+1_return − sector_historical_avg_daily_return<br/>
               signal    = excess_t1 × significance_score
             </div>
           </div>
           <div>
             <p className="text-lss-text font-semibold mb-1">Step 4 — Correlation</p>
-            <div className="font-mono text-[12px] rounded-xl p-4" style={{ background: "#0D1117", border: "1px solid #21262d" }}>
+            <div className="font-mono text-[12px] rounded-xl p-4" style={{ background: "#1A0800", border: "1px solid rgba(224,88,24,0.2)", color: "#F5EDD8" }}>
               r, p = pearsonR(significance_scores, t1_returns)<br/>
               p &lt; 0.05 → statistically significant at 95% confidence
             </div>
@@ -83,7 +83,7 @@ export default function MethodologyPage() {
         <div className="overflow-x-auto">
           <table className="w-full text-[12px]">
             <thead>
-              <tr className="text-lss-tertiary text-left" style={{ borderBottom: "1px solid #30363D" }}>
+              <tr className="text-lss-tertiary text-left" style={{ borderBottom: "1px solid rgba(180,148,100,0.35)" }}>
                 <th className="pb-2 font-semibold">Event Type</th>
                 <th className="pb-2 font-semibold">Base Score</th>
                 <th className="pb-2 font-semibold">Modifiers (+1 each, max 10)</th>
@@ -97,7 +97,7 @@ export default function MethodologyPage() {
                 ["Bill introduction / supplementary demand", "4", "Major controversy (+2), Cross-party debate (+1)"],
                 ["Calling Attention / discussion motion", "4", "Market-sensitive topic (+1, +2)"],
               ].map(([type, base, mod]) => (
-                <tr key={type} style={{ borderBottom: "1px solid #21262d" }}>
+                <tr key={type} style={{ borderBottom: "1px solid rgba(180,148,100,0.25)" }}>
                   <td className="py-2">{type}</td>
                   <td className="py-2 font-mono text-lss-accent">{base}</td>
                   <td className="py-2 text-lss-tertiary">{mod}</td>
@@ -118,7 +118,7 @@ export default function MethodologyPage() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 text-[12px]">
           {Object.entries(SECTOR_META).map(([sector, meta]) => (
             <div key={sector} className="rounded-xl p-3"
-              style={{ borderLeft: `3px solid ${meta.color}`, background: "rgba(22,27,34,0.6)" }}>
+              style={{ borderLeft: `3px solid ${meta.color}`, background: "rgba(245,237,216,0.5)" }}>
               <p className="font-semibold text-lss-text mb-1">{meta.label}</p>
               <p className="text-lss-tertiary">{meta.tickers.join(" · ")}</p>
             </div>
@@ -143,7 +143,7 @@ export default function MethodologyPage() {
             ["No controls", "Returns are not adjusted for Nifty 50 market-wide moves, VIX, FII flows, or global risk-off events. All these confound the measured signal."],
           ].map(([title, body]) => (
             <div key={title} className="rounded-xl p-3"
-              style={{ borderLeft: "3px solid #30363D", background: "rgba(22,27,34,0.5)" }}>
+              style={{ borderLeft: "3px solid rgba(180,148,100,0.5)", background: "rgba(245,237,216,0.5)" }}>
               <p className="text-lss-text text-[12px] font-semibold mb-1">⚠ {title}</p>
               <p className="text-lss-secondary text-[12px] leading-relaxed">{body}</p>
             </div>

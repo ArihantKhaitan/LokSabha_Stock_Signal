@@ -27,7 +27,7 @@ export default function EventCard({ signal, defaultOpen = false }: EventCardProp
       {/* Header */}
       <button
         onClick={() => setOpen((o) => !o)}
-        className="w-full text-left p-4 flex items-start gap-3 hover:bg-white/[0.02] transition-colors"
+        className="w-full text-left p-4 flex items-start gap-3 hover:bg-black/[0.02] transition-colors"
       >
         {/* Sector color bar */}
         <div className="w-1 self-stretch rounded-full shrink-0" style={{ background: color }} />
@@ -77,7 +77,7 @@ export default function EventCard({ signal, defaultOpen = false }: EventCardProp
           >
             <div
               className="px-4 pb-4 pt-0"
-              style={{ borderTop: `1px solid rgba(48,54,61,0.6)` }}
+              style={{ borderTop: `1px solid rgba(180,148,100,0.35)` }}
             >
               <p className="text-[13px] text-lss-secondary mt-3 mb-3 leading-relaxed">
                 {ev.summary}
@@ -101,7 +101,7 @@ export default function EventCard({ signal, defaultOpen = false }: EventCardProp
                     Signal strength:{" "}
                     <span
                       className="font-bold font-mono"
-                      style={{ color: signal.signal_strength >= 0 ? "#3FB950" : "#F85149" }}
+                      style={{ color: signal.signal_strength >= 0 ? "#1E7A30" : "#B82020" }}
                     >
                       {signal.signal_strength >= 0 ? "+" : ""}
                       {(signal.signal_strength * 100).toFixed(3)}

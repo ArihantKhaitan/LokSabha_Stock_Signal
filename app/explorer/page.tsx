@@ -86,8 +86,8 @@ export default function ExplorerPage() {
                 }`}
                 style={
                   sentiment === s
-                    ? { background: "rgba(255,107,53,0.15)", border: "1px solid rgba(255,107,53,0.3)" }
-                    : { background: "rgba(255,255,255,0.03)", border: "1px solid #30363D" }
+                    ? { background: "rgba(224,88,24,0.12)", border: "1px solid rgba(224,88,24,0.3)" }
+                    : { background: "rgba(180,148,100,0.08)", border: "1px solid rgba(180,148,100,0.3)" }
                 }
               >
                 {s}
@@ -113,7 +113,7 @@ export default function ExplorerPage() {
       {withData.length > 0 && (
         <motion.div
           className="mb-5 px-5 py-3 rounded-xl flex flex-wrap items-center gap-4 text-sm"
-          style={{ borderLeft: `4px solid ${color}`, background: "rgba(22,27,34,0.6)", border: `1px solid ${color}33` }}
+          style={{ borderLeft: `4px solid ${color}`, background: "rgba(250,246,238,0.8)", border: `1px solid ${color}55` }}
           initial={{ opacity: 0 }} animate={{ opacity: 1 }}
         >
           <span className="font-bold" style={{ color }}>{SECTOR_META[sector].label}</span>

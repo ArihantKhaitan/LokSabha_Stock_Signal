@@ -1,34 +1,15 @@
 /**
- * Real stock data via yahoo-finance2 (server-side only).
- * All prices are fetched from Yahoo Finance — no synthetic data.
+ * Real stock data via Yahoo Finance v8 API (server-side only).
+ * Uses direct HTTP to Yahoo Finance chart endpoint — no third-party wrapper needed.
+ * All prices are fetched live — no synthetic data.
  */
 import { SECTOR_META, DATA_START, dataEnd } from "@/lib/sectors";
 import type { SectorKey } from "@/types";
-import yahooFinanceDefault from "yahoo-finance2";
 
-type YFHistoricalRow = {
-  date: Date;
-  open?: number | null;
-  high?: number | null;
-  low?: number | null;
-  close?: number | null;
-  volume?: number | null;
+const YF_HEADERS = {
+  "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+  "Accept": "application/json",
 };
-
-type YFQuote = {
-  regularMarketPrice?: number | null;
-  regularMarketChange?: number | null;
-  regularMarketChangePercent?: number | null;
-  marketState?: string | null;
-};
-
-type YFClient = {
-  historical: (symbol: string, opts: { period1: string; period2: string; interval: string }) => Promise<YFHistoricalRow[]>;
-  quote: (symbol: string) => Promise<YFQuote>;
-};
-
-// bundler moduleResolution gives us the class type, not the singleton — cast to real shape
-const yf = yahooFinanceDefault as unknown as YFClient;
 
 export interface OHLCVRow {
   ticker: string;
@@ -52,25 +33,83 @@ export async function fetchTickerHistory(
   to:   string = dataEnd()
 ): Promise<OHLCVRow[]> {
   try {
-    const result = await yf.historical(ticker, {
-      period1: from,
-      period2: to,
-      interval: "1d",
-    });
+    const p1  = Math.floor(new Date(from).getTime() / 1000);
+    const p2  = Math.floor(new Date(to).getTime()   / 1000) + 86400;
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?period1=${p1}&period2=${p2}&interval=1d`;
 
-    return result
-      .filter((r) => r.close != null)
-      .map((r) => ({
-        ticker,
-        date:   r.date.toISOString().slice(0, 10),
-        open:   r.open   ?? r.close ?? 0,
-        high:   r.high   ?? r.close ?? 0,
-        low:    r.low    ?? r.close ?? 0,
-        close:  r.close!,
-        volume: r.volume ?? 0,
-      }));
+    const res  = await fetch(url, { headers: YF_HEADERS });
+    if (!res.ok) return [];
+    const data = await res.json() as {
+      chart?: {
+        result?: Array<{
+          timestamp?: number[];
+          indicators?: {
+            quote?: Array<{ open: (number|null)[]; high: (number|null)[]; low: (number|null)[]; close: (number|null)[]; volume: (number|null)[] }>;
+          };
+        }>;
+      };
+    };
+
+    const result = data?.chart?.result?.[0];
+    if (!result?.timestamp) return [];
+
+    const ts    = result.timestamp;
+    const q     = result.indicators?.quote?.[0];
+    if (!q) return [];
+
+    return ts
+      .map((unix, i) => {
+        const close = q.close[i];
+        if (close == null) return null;
+        return {
+          ticker,
+          date:   new Date(unix * 1000).toISOString().slice(0, 10),
+          open:   q.open[i]   ?? close,
+          high:   q.high[i]   ?? close,
+          low:    q.low[i]    ?? close,
+          close,
+          volume: q.volume[i] ?? 0,
+        };
+      })
+      .filter((r): r is OHLCVRow => r !== null);
   } catch {
     return [];
+  }
+}
+
+/** Fetch live quote for a single ticker via Yahoo Finance v8 API. */
+async function fetchQuoteRaw(ticker: string) {
+  try {
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(ticker)}?interval=1d&range=1d`;
+    const res  = await fetch(url, { headers: YF_HEADERS });
+    if (!res.ok) return null;
+    const data = await res.json() as {
+      chart?: {
+        result?: Array<{
+          meta?: {
+            regularMarketPrice?: number;
+            chartPreviousClose?: number;
+            regularMarketTime?: number;
+            marketState?: string;
+          };
+        }>;
+      };
+    };
+    const meta = data?.chart?.result?.[0]?.meta;
+    if (!meta?.regularMarketPrice) return null;
+    const price  = meta.regularMarketPrice;
+    const prev   = meta.chartPreviousClose ?? price;
+    const change = price - prev;
+    return {
+      ticker,
+      price,
+      change,
+      changePct:   prev > 0 ? (change / prev) * 100 : 0,
+      marketState: meta.marketState ?? null,
+      updatedAt:   new Date().toISOString(),
+    };
+  } catch {
+    return null;
   }
 }
 
@@ -81,7 +120,7 @@ export async function fetchSectorBasket(
   to:   string = dataEnd()
 ): Promise<Map<string, Map<string, number>>> {
   const tickers = SECTOR_META[sector]?.tickers ?? [];
-  const byDate = new Map<string, Map<string, number>>();
+  const byDate  = new Map<string, Map<string, number>>();
 
   await Promise.all(
     tickers.map(async (tkr) => {
@@ -145,19 +184,7 @@ export function averageDailyReturn(returns: DailyReturn[]): number {
 
 /** Fetch current quote for a ticker (real-time). */
 export async function fetchQuote(ticker: string) {
-  try {
-    const q = await yf.quote(ticker);
-    return {
-      ticker,
-      price:       q.regularMarketPrice ?? null,
-      change:      q.regularMarketChange ?? null,
-      changePct:   q.regularMarketChangePercent ?? null,
-      marketState: q.marketState ?? null,
-      updatedAt:   new Date().toISOString(),
-    };
-  } catch {
-    return null;
-  }
+  return fetchQuoteRaw(ticker);
 }
 
 /** Fetch live quotes for all tracked tickers (for ticker tape). */

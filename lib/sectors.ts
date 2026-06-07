@@ -27,7 +27,7 @@ export const SECTOR_META: Record<SectorKey, SectorMeta> = {
   },
   Auto: {
     label: "Automobile & EV",
-    tickers: ["MARUTI.NS", "TATAMOTORS.NS", "M&M.NS"],
+    tickers: ["MARUTI.NS", "TATAMOTORS.BO", "M&M.NS"],
     color: "#FFA726",
     description: "Maruti · Tata Motors · M&M",
   },
@@ -51,7 +51,7 @@ export const SECTOR_META: Record<SectorKey, SectorMeta> = {
   },
   Infrastructure: {
     label: "Infrastructure & Construction",
-    tickers: ["LT.NS", "NCCLTD.NS", "KNRCON.NS"],
+    tickers: ["LT.NS", "NCC.NS", "KNRCON.NS"],
     color: "#8D6E63",
     description: "L&T · NCC · KNR Constructions",
   },

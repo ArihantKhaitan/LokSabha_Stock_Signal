@@ -1,14 +1,22 @@
 import StatCard from "@/components/StatCard";
 import SessionTimeline from "@/components/SessionTimeline";
 import { computeAllSignals, buildSummaryStats, computeAllCorrelations } from "@/lib/signals";
+import { getSignals as getSupabaseSignals } from "@/lib/supabase";
 import { SECTOR_META } from "@/lib/sectors";
 import { fmtPct, fmtDate } from "@/lib/utils";
+import type { EventSignal } from "@/types";
 
 export const revalidate = 3600; // ISR: regenerate every hour
 
 async function getStats() {
   try {
-    const signals      = await computeAllSignals();
+    let signals: EventSignal[] = [];
+    try {
+      const cached = await getSupabaseSignals();
+      if (cached.length >= 10) signals = cached;
+    } catch { /* fall through */ }
+    if (!signals.length) signals = await computeAllSignals();
+
     const summary      = buildSummaryStats(signals);
     const correlations = computeAllCorrelations(signals);
     return { summary, correlations, ok: true };
@@ -30,7 +38,7 @@ export default async function HomePage() {
       {/* ── Hero ─────────────────────────────────────────────────────── */}
       <div className="text-center mb-14 animate-fade-up">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-5 text-[11px] font-semibold uppercase tracking-widest"
-          style={{ background: "rgba(255,107,53,0.1)", border: "1px solid rgba(255,107,53,0.25)", color: "#FF6B35" }}>
+          style={{ background: "rgba(224,88,24,0.1)", border: "1px solid rgba(224,88,24,0.25)", color: "#E05818" }}>
           <span className="w-1.5 h-1.5 rounded-full bg-lss-accent animate-pulse-glow" />
           Academic Research · Real NSE Data · Not Financial Advice
         </div>
@@ -96,19 +104,19 @@ export default async function HomePage() {
             debate significance and returns.
           </p>
           <div className="font-mono text-sm rounded-xl p-4"
-            style={{ background: "rgba(13,17,23,0.8)", border: "1px solid #21262d" }}>
-            <span className="text-lss-secondary">{"// Signal formula"}</span>
+            style={{ background: "#1A0800", border: "1px solid rgba(224,88,24,0.2)" }}>
+            <span style={{ color: "rgba(245,237,216,0.5)" }}>{"// Signal formula"}</span>
             <br />
-            <span className="text-lss-blue">excess_t1</span>{" "}
-            <span className="text-lss-text">= T+1_return − sector_avg_daily_return</span>
+            <span style={{ color: "#FF9060" }}>excess_t1</span>{" "}
+            <span style={{ color: "#F5EDD8" }}>= T+1_return − sector_avg_daily_return</span>
             <br />
-            <span className="text-lss-blue">signal</span>{" "}
-            <span className="text-lss-text">= excess_t1 × significance_score</span>
+            <span style={{ color: "#FF9060" }}>signal</span>{" "}
+            <span style={{ color: "#F5EDD8" }}>= excess_t1 × significance_score</span>
             <br />
-            <span className="text-lss-secondary">{"// Correlation"}</span>
+            <span style={{ color: "rgba(245,237,216,0.5)" }}>{"// Correlation"}</span>
             <br />
-            <span className="text-lss-blue">r, p</span>{" "}
-            <span className="text-lss-text">= pearsonR(significance_scores, t1_returns)</span>
+            <span style={{ color: "#FF9060" }}>r, p</span>{" "}
+            <span style={{ color: "#F5EDD8" }}>= pearsonR(significance_scores, t1_returns)</span>
           </div>
           <p className="text-[11px] text-lss-tertiary mt-3 italic">
             Inspired by Ziobrowski et al. (2004) &mdash; &ldquo;Abnormal Returns from US Senate Stock Investments&rdquo;
@@ -153,7 +161,7 @@ export default async function HomePage() {
               .map((c) => {
                 const color = SECTOR_META[c.sector]?.color ?? "#FF6B35";
                 const pct   = c.mean_t1_pct;
-                const retColor = pct >= 0 ? "#3FB950" : "#F85149";
+                const retColor = pct >= 0 ? "#1E7A30" : "#B82020";
                 return (
                   <div
                     key={c.sector}
@@ -180,7 +188,7 @@ export default async function HomePage() {
       )}
 
       {/* ── Disclaimer ───────────────────────────────────────────────── */}
-      <div className="rounded-2xl p-5" style={{ background: "rgba(248,81,73,0.06)", border: "1px solid rgba(248,81,73,0.2)" }}>
+      <div className="rounded-2xl p-5" style={{ background: "rgba(184,32,32,0.06)", border: "1px solid rgba(184,32,32,0.2)" }}>
         <p className="text-[12px] text-lss-red font-bold mb-1">⚠ Research Disclaimer</p>
         <p className="text-[12px] text-lss-secondary leading-relaxed">
           This platform is for academic and educational purposes only. Stock price data is fetched

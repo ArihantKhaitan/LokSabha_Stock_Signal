@@ -93,12 +93,12 @@ export default function DeepDivePage() {
         and the parliamentary tone was <strong className="text-lss-text">{ev.sentiment}</strong> toward the {ev.sector} sector.
         <br /><br />
         In the trading session immediately following (T+1), the {SECTOR_META[ev.sector]?.label ?? ev.sector} basket{" "}
-        <strong style={{ color: signal.ret_t1 >= 0 ? "#3FB950" : "#F85149" }}>{dir} {pct1}%</strong>.
+        <strong style={{ color: signal.ret_t1 >= 0 ? "#1E7A30" : "#B82020" }}>{dir} {pct1}%</strong>.
         This was <strong className="text-lss-text">{exPct}%</strong> {exDir} the sector&rsquo;s historical daily average,{" "}
         {parseFloat(exPct) > 0.2 ? "suggesting a non-trivial market reaction." : "a movement consistent with normal daily variance."}
         <br /><br />
         Over the following week (T+5), the basket{" "}
-        <strong style={{ color: (signal.ret_t5 ?? 0) >= 0 ? "#3FB950" : "#F85149" }}>{dirT5} {pct5}%</strong>.{" "}
+        <strong style={{ color: (signal.ret_t5 ?? 0) >= 0 ? "#1E7A30" : "#B82020" }}>{dirT5} {pct5}%</strong>.{" "}
         <em className="text-lss-tertiary text-[11px]">
           Note: These movements reflect the equal-weighted basket average across {SECTOR_META[ev.sector]?.tickers.length} stocks
           and are influenced by many concurrent market factors beyond the parliamentary debate. Correlation ≠ causation.
@@ -143,7 +143,7 @@ export default function DeepDivePage() {
       {ev && (
         <div
           className="rounded-2xl p-5 mb-6"
-          style={{ borderLeft: `4px solid ${color}`, background: "rgba(22,27,34,0.7)", border: `1px solid ${color}33`, borderLeftWidth: 4 }}
+          style={{ borderLeft: `4px solid ${color}`, background: "rgba(250,246,238,0.8)", border: `1px solid ${color}55`, borderLeftWidth: 4 }}
         >
           <div className="flex flex-wrap items-center gap-2 mb-2">
             <span className="text-[11px] font-mono text-lss-tertiary">{fmtDate(ev.date)}</span>
@@ -196,7 +196,7 @@ export default function DeepDivePage() {
           <div className="overflow-x-auto">
             <table className="w-full text-[12px]">
               <thead>
-                <tr className="text-lss-tertiary text-left" style={{ borderBottom: "1px solid #30363D" }}>
+                <tr className="text-lss-tertiary text-left" style={{ borderBottom: "1px solid rgba(180,148,100,0.35)" }}>
                   <th className="pb-2 font-semibold">Window</th>
                   <th className="pb-2 font-semibold">Basket Return</th>
                   <th className="pb-2 font-semibold">vs Historical Avg</th>
@@ -209,19 +209,19 @@ export default function DeepDivePage() {
                   { label: "T+2 (2 days after)", val: signal.ret_t2, excess: null },
                   { label: "T+5 (1 week after)", val: signal.ret_t5, excess: null },
                 ].map((row) => (
-                  <tr key={row.label} style={{ borderBottom: "1px solid #21262d" }}>
+                  <tr key={row.label} style={{ borderBottom: "1px solid rgba(180,148,100,0.25)" }}>
                     <td className="py-2">{row.label}</td>
                     <td className="py-2">
                       <span
                         className="font-bold font-mono"
-                        style={{ color: (row.val ?? 0) >= 0 ? "#3FB950" : "#F85149" }}
+                        style={{ color: (row.val ?? 0) >= 0 ? "#1E7A30" : "#B82020" }}
                       >
                         {fmtPct(row.val)}
                       </span>
                     </td>
                     <td className="py-2 text-lss-tertiary font-mono">
                       {row.excess != null
-                        ? <span style={{ color: row.excess >= 0 ? "#3FB950" : "#F85149" }}>
+                        ? <span style={{ color: row.excess >= 0 ? "#1E7A30" : "#B82020" }}>
                             {fmtPct(row.excess)} vs avg
                           </span>
                         : "—"}
