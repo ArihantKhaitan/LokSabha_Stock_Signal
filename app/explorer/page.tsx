@@ -48,10 +48,10 @@ export default function ExplorerPage() {
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10">
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-        <h1 className="text-3xl font-black text-lss-text mb-2">Signal Explorer</h1>
+        <h1 className="text-3xl font-black text-lss-text mb-2">Browse Debates</h1>
         <p className="text-lss-secondary text-sm">
-          Browse every real parliamentary debate event by sector. Return chips show next-day,
-          2-day and 5-day sector basket returns fetched live from Yahoo Finance.
+          Pick a sector to see every parliament debate we tracked — and what happened to those stocks
+          the next day, 2 days later, and 5 days later.
         </p>
       </motion.div>
 
@@ -99,7 +99,7 @@ export default function ExplorerPage() {
         {/* Min significance */}
         <div className="flex flex-col gap-1">
           <label className="text-[10px] font-bold text-lss-tertiary uppercase tracking-widest">
-            Min Significance: {minSig}/10
+            Min Debate Importance: {minSig}/10
           </label>
           <input
             type="range" min={1} max={10} value={minSig}
@@ -118,16 +118,16 @@ export default function ExplorerPage() {
         >
           <span className="font-bold" style={{ color }}>{SECTOR_META[sector].label}</span>
           <span className="text-lss-secondary">
-            {filtered.length} events · Avg T+1:{" "}
+            {filtered.length} debates · Next-day avg:{" "}
             <span className={`font-bold font-mono ${avgT1 >= 0 ? "text-lss-green" : "text-lss-red"}`}>
               {fmtPct(avgT1)}
             </span>
-            {" "}· Avg T+5:{" "}
+            {" "}· 5-day avg:{" "}
             <span className={`font-bold font-mono ${avgT5 >= 0 ? "text-lss-green" : "text-lss-red"}`}>
               {fmtPct(avgT5)}
             </span>
           </span>
-          <span className="text-lss-tertiary text-[11px]">n={withData.length} with market data</span>
+          <span className="text-lss-tertiary text-[11px]">{withData.length} with price data</span>
         </motion.div>
       )}
 
@@ -155,8 +155,7 @@ export default function ExplorerPage() {
       )}
 
       <p className="text-[10px] text-lss-tertiary mt-6 text-center">
-        ✅ Stock returns: real data from Yahoo Finance via yahoo-finance2 ·
-        ⚠ Significance scores: estimated (see Methodology for formula)
+        Stock prices are real NSE/BSE data from Yahoo Finance · Debate importance scores are estimated — see Methodology
       </p>
     </div>
   );

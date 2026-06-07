@@ -24,12 +24,17 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2.5 shrink-0">
           <motion.div
-            className="w-7 h-7 rounded-lg flex items-center justify-center font-black text-sm"
-            style={{ background: "linear-gradient(135deg, #E05818, #C04010)" }}
-            whileHover={{ scale: 1.08, rotate: 3 }}
+            whileHover={{ scale: 1.08 }}
             transition={{ type: "spring", stiffness: 300 }}
           >
-            🏛
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5 18 Q5 4 16 4 Q27 4 27 18" stroke="#E05818" strokeWidth="2.5" strokeLinecap="round" fill="rgba(224,88,24,0.1)"/>
+              <rect x="6.5" y="18" width="3.5" height="8.5" rx="1" fill="#E05818" opacity="0.8"/>
+              <rect x="14.25" y="15" width="3.5" height="11.5" rx="1" fill="#E05818"/>
+              <rect x="22" y="18" width="3.5" height="8.5" rx="1" fill="#E05818" opacity="0.8"/>
+              <rect x="3.5" y="26.5" width="25" height="2.5" rx="1.25" fill="#E05818"/>
+              <circle cx="16" cy="4" r="1.8" fill="#E05818"/>
+            </svg>
           </motion.div>
           <span
             className="font-bold text-[15px] tracking-tight hidden sm:inline"
@@ -69,12 +74,8 @@ export default function Navbar() {
           })}
         </nav>
 
-        {/* Disclaimer badge */}
-        <div className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-full"
-          style={{ background: "rgba(184,32,32,0.15)", border: "1px solid rgba(184,32,32,0.3)" }}>
-          <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "#B82020" }} />
-          <span className="text-[11px] font-semibold" style={{ color: "#E07070" }}>Not Financial Advice</span>
-        </div>
+        {/* Spacer to balance flex layout */}
+        <div className="w-[130px]" />
       </div>
     </header>
   );

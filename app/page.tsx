@@ -6,7 +6,7 @@ import { SECTOR_META } from "@/lib/sectors";
 import { fmtPct, fmtDate } from "@/lib/utils";
 import type { EventSignal } from "@/types";
 
-export const revalidate = 3600; // ISR: regenerate every hour
+export const revalidate = 3600;
 
 async function getStats() {
   try {
@@ -28,109 +28,111 @@ async function getStats() {
 export default async function HomePage() {
   const { summary, correlations } = await getStats();
 
-  const strongestSig  = summary?.strongest_signal;
-  const sigPct        = strongestSig?.ret_t1 != null ? fmtPct(strongestSig.ret_t1) : "N/A";
-  const sigCount      = correlations.filter((c) => c.is_significant).length;
+  const strongestSig = summary?.strongest_signal;
+  const sigPct       = strongestSig?.ret_t1 != null ? fmtPct(strongestSig.ret_t1) : "N/A";
+  const sigCount     = correlations.filter((c) => c.is_significant).length;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
 
       {/* ── Hero ─────────────────────────────────────────────────────── */}
       <div className="text-center mb-14 animate-fade-up">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full mb-5 text-[11px] font-semibold uppercase tracking-widest"
-          style={{ background: "rgba(224,88,24,0.1)", border: "1px solid rgba(224,88,24,0.25)", color: "#E05818" }}>
-          <span className="w-1.5 h-1.5 rounded-full bg-lss-accent animate-pulse-glow" />
-          Academic Research · Real NSE Data · Not Financial Advice
-        </div>
-
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight mb-4 leading-none">
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight mb-5 leading-none">
           <span className="text-gradient">LokSabha</span>
           <span className="text-lss-text"> Stock Signal</span>
         </h1>
-
         <p className="text-lss-secondary text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-          When Parliament debates pharma regulation, defence procurement, or banking reform —
-          do related sector stocks move in the days that follow?
-          This tool quantifies that relationship using{" "}
-          <span className="text-lss-text font-semibold">real NSE price data</span> and{" "}
-          <span className="text-lss-text font-semibold">verified Lok Sabha records</span>.
+          When Parliament debates pharma regulation, defence budgets, or banking reform —
+          do related stocks move the next day?
+          We track <span className="text-lss-text font-semibold">43 real parliamentary debates</span> and
+          measure what happened to stock prices immediately after.
         </p>
       </div>
 
       {/* ── Stat cards ───────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
         <StatCard
-          label="Debates Analysed"
+          label="Debates Tracked"
           value={String(summary?.total_debates ?? "—")}
-          sub="Across 6 real sessions"
+          sub="Real Lok Sabha sessions"
           color="#FF6B35"
           delay={0}
         />
         <StatCard
-          label="Sectors Tracked"
+          label="Sectors Covered"
           value={String(summary?.sectors_covered ?? 9)}
-          sub="26 NSE-listed stocks"
+          sub="Pharma, Defence, IT & more"
           color="#58A6FF"
           delay={0.08}
         />
         <StatCard
-          label="Strongest T+1 Signal"
+          label="Biggest Single-Day Move"
           value={sigPct}
-          sub={strongestSig ? `${strongestSig.event.sector} — ${fmtDate(strongestSig.event.date)}` : ""}
+          sub={strongestSig ? `${strongestSig.event.sector} · ${fmtDate(strongestSig.event.date)}` : ""}
           color={strongestSig && (strongestSig.ret_t1 ?? 0) >= 0 ? "#3FB950" : "#F85149"}
           delay={0.16}
         />
         <StatCard
-          label="Sig. Correlations"
+          label="Sectors That Reacted"
           value={`${sigCount} / ${correlations.length}`}
-          sub="Sectors with p < 0.05"
+          sub="With a statistically real pattern"
           color="#BC8CFF"
           delay={0.24}
         />
       </div>
 
-      {/* ── Hypothesis section ───────────────────────────────────────── */}
+      {/* ── How it works ─────────────────────────────────────────────── */}
       <div className="grid lg:grid-cols-3 gap-6 mb-10">
         <div className="lg:col-span-2 glass glass-shimmer rounded-2xl p-6">
-          <h2 className="text-lg font-bold text-lss-text mb-3">The Hypothesis</h2>
-          <p className="text-lss-secondary text-sm leading-relaxed mb-4">
-            When India&rsquo;s Parliament debates a sector-specific bill — higher pharma regulation,
-            larger defence budgets, banking reform — does the market react? We test this by
-            computing the{" "}
-            <span className="text-lss-accent font-semibold">T+1 sector basket return</span> (next
-            trading day) following each debate, comparing it against the sector&rsquo;s historical
-            average, and running{" "}
-            <span className="text-lss-accent font-semibold">Pearson correlation</span> between
-            debate significance and returns.
-          </p>
-          <div className="font-mono text-sm rounded-xl p-4"
-            style={{ background: "#1A0800", border: "1px solid rgba(224,88,24,0.2)" }}>
-            <span style={{ color: "rgba(245,237,216,0.5)" }}>{"// Signal formula"}</span>
-            <br />
-            <span style={{ color: "#FF9060" }}>excess_t1</span>{" "}
-            <span style={{ color: "#F5EDD8" }}>= T+1_return − sector_avg_daily_return</span>
-            <br />
-            <span style={{ color: "#FF9060" }}>signal</span>{" "}
-            <span style={{ color: "#F5EDD8" }}>= excess_t1 × significance_score</span>
-            <br />
-            <span style={{ color: "rgba(245,237,216,0.5)" }}>{"// Correlation"}</span>
-            <br />
-            <span style={{ color: "#FF9060" }}>r, p</span>{" "}
-            <span style={{ color: "#F5EDD8" }}>= pearsonR(significance_scores, t1_returns)</span>
+          <h2 className="text-lg font-bold text-lss-text mb-4">How It Works</h2>
+
+          {/* 3-step flow */}
+          <div className="grid sm:grid-cols-3 gap-4 mb-5">
+            {[
+              {
+                step: "1",
+                title: "Parliament debates",
+                desc: "A sector-specific bill is discussed — e.g. higher defence budget, pharma pricing regulation, or banking reform.",
+              },
+              {
+                step: "2",
+                title: "We track stocks",
+                desc: "We measure how much that sector's stocks moved the next day, 2 days later, and 5 days later.",
+              },
+              {
+                step: "3",
+                title: "Is there a pattern?",
+                desc: "We check whether bigger/more important debates consistently lead to bigger stock moves.",
+              },
+            ].map(({ step, title, desc }) => (
+              <div key={step} className="flex flex-col gap-2">
+                <div
+                  className="w-7 h-7 rounded-full flex items-center justify-center text-[12px] font-black shrink-0"
+                  style={{ background: "rgba(224,88,24,0.15)", color: "#E05818", border: "1px solid rgba(224,88,24,0.3)" }}
+                >
+                  {step}
+                </div>
+                <p className="text-[13px] font-semibold text-lss-text">{title}</p>
+                <p className="text-[12px] text-lss-secondary leading-relaxed">{desc}</p>
+              </div>
+            ))}
           </div>
-          <p className="text-[11px] text-lss-tertiary mt-3 italic">
-            Inspired by Ziobrowski et al. (2004) &mdash; &ldquo;Abnormal Returns from US Senate Stock Investments&rdquo;
+
+          <p className="text-[11px] text-lss-tertiary italic">
+            Inspired by Ziobrowski et al. (2004) — &ldquo;Abnormal Returns from US Senate Stock Investments&rdquo;.
+            Stock prices are real NSE/BSE data from Yahoo Finance.
           </p>
         </div>
 
+        {/* Glossary */}
         <div className="glass rounded-2xl p-5 flex flex-col gap-3">
-          <h3 className="text-sm font-bold text-lss-text">Reading the Data</h3>
+          <h3 className="text-sm font-bold text-lss-text">What the numbers mean</h3>
           {[
-            ["T+1 / T+2 / T+5", "Equal-weighted basket return 1, 2, 5 trading days after debate"],
-            ["Significance (1–10)", "Estimated: bill type × session × national importance. Transparent formula — see Methodology"],
-            ["Sentiment", "Positive = sector-friendly (funding/deregulation). Negative = restrictive/punitive"],
-            ["r / p-value", "Pearson correlation. p < 0.05 = statistically significant at 95% level"],
-            ["⚠ Disclaimer", "Stock prices are real (Yahoo Finance). Significance scores are estimates. Correlation ≠ causation."],
+            ["+1.2% next-day", "The sector basket moved +1.2% the trading day after the debate"],
+            ["Debate importance (1–10)", "How significant we estimated the debate to be — based on bill type and national impact"],
+            ["Sentiment", "Did the debate favour the sector (positive) or threaten it (negative)?"],
+            ["Pattern strength (r)", "How consistently bigger debates led to bigger moves. Near ±1 = strong, near 0 = no pattern"],
+            ["Statistically real (p<0.05)", "There's less than 5% chance this pattern is random noise"],
           ].map(([label, desc]) => (
             <div key={label} className="flex gap-2">
               <span className="text-lss-accent text-[11px] font-bold shrink-0 mt-0.5">{label}</span>
@@ -148,19 +150,24 @@ export default async function HomePage() {
         <SessionTimeline />
       </div>
 
-      {/* ── Most reactive sectors ────────────────────────────────────── */}
+      {/* ── Sector summary ───────────────────────────────────────────── */}
       {correlations.length > 0 && (
         <div className="mb-10">
-          <h2 className="text-sm font-semibold text-lss-secondary uppercase tracking-widest mb-4">
-            Sector Summary — Mean T+1 Return After Debates
-          </h2>
+          <div className="mb-4">
+            <h2 className="text-sm font-semibold text-lss-secondary uppercase tracking-widest">
+              Average Stock Move After Debates
+            </h2>
+            <p className="text-[11px] text-lss-tertiary mt-1">
+              The day after Parliament debated each sector — did those stocks go up or down on average?
+            </p>
+          </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {correlations
               .filter((c) => c.n_events > 0)
               .sort((a, b) => Math.abs(b.mean_t1_pct) - Math.abs(a.mean_t1_pct))
               .map((c) => {
-                const color = SECTOR_META[c.sector]?.color ?? "#FF6B35";
-                const pct   = c.mean_t1_pct;
+                const color    = SECTOR_META[c.sector]?.color ?? "#FF6B35";
+                const pct      = c.mean_t1_pct;
                 const retColor = pct >= 0 ? "#1E7A30" : "#B82020";
                 return (
                   <div
@@ -170,14 +177,14 @@ export default async function HomePage() {
                   >
                     <div>
                       <p className="text-[12px] font-semibold text-lss-text">{SECTOR_META[c.sector]?.label}</p>
-                      <p className="text-[10px] text-lss-tertiary">n={c.n_events} · r={c.pearson_r?.toFixed(2) ?? "N/A"}</p>
+                      <p className="text-[10px] text-lss-tertiary">{c.n_events} debates analysed</p>
                     </div>
                     <div className="text-right">
                       <span className="text-[15px] font-bold font-mono" style={{ color: retColor }}>
                         {pct >= 0 ? "+" : ""}{pct.toFixed(2)}%
                       </span>
                       {c.is_significant && (
-                        <p className="text-[9px] text-lss-accent font-bold">★ p&lt;0.05</p>
+                        <p className="text-[9px] text-lss-accent font-bold">consistent pattern</p>
                       )}
                     </div>
                   </div>
@@ -187,17 +194,11 @@ export default async function HomePage() {
         </div>
       )}
 
-      {/* ── Disclaimer ───────────────────────────────────────────────── */}
-      <div className="rounded-2xl p-5" style={{ background: "rgba(184,32,32,0.06)", border: "1px solid rgba(184,32,32,0.2)" }}>
-        <p className="text-[12px] text-lss-red font-bold mb-1">⚠ Research Disclaimer</p>
-        <p className="text-[12px] text-lss-secondary leading-relaxed">
-          This platform is for academic and educational purposes only. Stock price data is fetched
-          live from Yahoo Finance. Parliamentary significance scores are estimated using a transparent
-          formula (see Methodology). Correlations shown are based on a small dataset (n ≈ 6–12 per
-          sector) and must not be used to make investment decisions. Correlation does not imply
-          causation. Past relationships do not predict future market behaviour.
-        </p>
-      </div>
+      {/* ── Footer note ──────────────────────────────────────────────── */}
+      <p className="text-center text-[11px] text-lss-tertiary">
+        Stock prices are real data from Yahoo Finance. Debate importance scores are estimated.
+        This is a research tool — not investment advice.
+      </p>
     </div>
   );
 }
