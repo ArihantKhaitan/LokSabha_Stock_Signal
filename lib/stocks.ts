@@ -2,11 +2,30 @@
  * Real stock data via yahoo-finance2 (server-side only).
  * All prices are fetched from Yahoo Finance — no synthetic data.
  */
-import yahooFinanceDefault from "yahoo-finance2";
-// bundler moduleResolution resolves the default export as the class, not the singleton instance
-const yahooFinance = yahooFinanceDefault as any; // eslint-disable-line
 import { SECTOR_META, DATA_START, dataEnd } from "@/lib/sectors";
 import type { SectorKey } from "@/types";
+// bundler moduleResolution resolves the CJS default export as the class, not the singleton
+// eslint-disable-line is intentional — @typescript-eslint plugin is not installed
+import yahooFinanceDefault from "yahoo-finance2";
+const yf = yahooFinanceDefault as unknown as {
+  historical: (
+    ticker: string,
+    opts: { period1: string; period2: string; interval: string }
+  ) => Promise<Array<{
+    date: Date;
+    open?: number | null;
+    high?: number | null;
+    low?: number | null;
+    close?: number | null;
+    volume?: number | null;
+  }>>;
+  quote: (ticker: string) => Promise<{
+    regularMarketPrice?: number | null;
+    regularMarketChange?: number | null;
+    regularMarketChangePercent?: number | null;
+    marketState?: string | null;
+  }>;
+};
 
 export interface OHLCVRow {
   ticker: string;
@@ -20,7 +39,7 @@ export interface OHLCVRow {
 
 export interface DailyReturn {
   date:   string;
-  return: number; // decimal, e.g. 0.0123 = +1.23%
+  return: number;
 }
 
 /** Fetch OHLCV for a single ticker between two ISO date strings. */
@@ -30,7 +49,7 @@ export async function fetchTickerHistory(
   to:   string = dataEnd()
 ): Promise<OHLCVRow[]> {
   try {
-    const result = await yahooFinance.historical(ticker, {
+    const result = await yf.historical(ticker, {
       period1: from,
       period2: to,
       interval: "1d",
@@ -41,9 +60,9 @@ export async function fetchTickerHistory(
       .map((r) => ({
         ticker,
         date:   r.date.toISOString().slice(0, 10),
-        open:   r.open   ?? r.close,
-        high:   r.high   ?? r.close,
-        low:    r.low    ?? r.close,
+        open:   r.open   ?? r.close ?? 0,
+        high:   r.high   ?? r.close ?? 0,
+        low:    r.low    ?? r.close ?? 0,
         close:  r.close!,
         volume: r.volume ?? 0,
       }));
@@ -81,14 +100,14 @@ export async function computeSectorReturns(
   to:   string = dataEnd()
 ): Promise<DailyReturn[]> {
   const basket = await fetchSectorBasket(sector, from, to);
-  const dates  = [...basket.keys()].sort();
+  const dates  = Array.from(basket.keys()).sort();
 
   const basketPrices: { date: string; avg: number }[] = dates
     .map((d) => {
-      const prices = [...basket.get(d)!.values()].filter((v) => v > 0);
+      const prices = Array.from(basket.get(d)!.values()).filter((v) => v > 0);
       return prices.length ? { date: d, avg: prices.reduce((a, b) => a + b, 0) / prices.length } : null;
     })
-    .filter(Boolean) as { date: string; avg: number }[];
+    .filter((x): x is { date: string; avg: number } => x !== null);
 
   const returns: DailyReturn[] = [];
   for (let i = 1; i < basketPrices.length; i++) {
@@ -107,12 +126,9 @@ export function basketReturnAtOffset(
   targetDate: string,
   offset: number
 ): number | null {
-  const sorted = [...returns].sort((a, b) => a.date.localeCompare(b.date));
-
-  // Find the first return date on or after targetDate
-  let idx = sorted.findIndex((r) => r.date >= targetDate);
+  const sorted = Array.from(returns).sort((a, b) => a.date.localeCompare(b.date));
+  const idx = sorted.findIndex((r) => r.date >= targetDate);
   if (idx === -1) return null;
-
   const targetIdx = idx + offset;
   if (targetIdx < 0 || targetIdx >= sorted.length) return null;
   return sorted[targetIdx].return;
@@ -127,13 +143,13 @@ export function averageDailyReturn(returns: DailyReturn[]): number {
 /** Fetch current quote for a ticker (real-time). */
 export async function fetchQuote(ticker: string) {
   try {
-    const q = await yahooFinance.quote(ticker);
+    const q = await yf.quote(ticker);
     return {
       ticker,
-      price:       q.regularMarketPrice,
-      change:      q.regularMarketChange,
-      changePct:   q.regularMarketChangePercent,
-      marketState: q.marketState,
+      price:       q.regularMarketPrice ?? null,
+      change:      q.regularMarketChange ?? null,
+      changePct:   q.regularMarketChangePercent ?? null,
+      marketState: q.marketState ?? null,
       updatedAt:   new Date().toISOString(),
     };
   } catch {
@@ -145,6 +161,8 @@ export async function fetchQuote(ticker: string) {
 export async function fetchAllQuotes(tickers: string[]) {
   const results = await Promise.allSettled(tickers.map(fetchQuote));
   return results
-    .filter((r) => r.status === "fulfilled" && r.value != null)
-    .map((r) => (r as PromiseFulfilledResult<Awaited<ReturnType<typeof fetchQuote>>>).value!);
+    .filter((r): r is PromiseFulfilledResult<Awaited<ReturnType<typeof fetchQuote>>> =>
+      r.status === "fulfilled" && r.value != null
+    )
+    .map((r) => r.value!);
 }
