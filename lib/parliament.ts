@@ -602,4 +602,4 @@ export function getEventById(id: string): ParliamentEvent | undefined {
   return PARLIAMENT_EVENTS.find((e) => e.id === id);
 }
 
-export const ALL_SESSIONS = [...new Set(PARLIAMENT_EVENTS.map((e) => e.session))];
+export const ALL_SESSIONS = Array.from(new Set(PARLIAMENT_EVENTS.map((e) => e.session)));
